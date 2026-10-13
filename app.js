@@ -1,45 +1,5 @@
-/* =====================================================================
-   Cantrip: app.js
-
-   One file, plain JavaScript, no build step. Sections, in order:
-     1. Helpers and constants
-     2. App state (what is saved in the browser)
-     3. Navigation between pages
-     4. Home page (dice roller, HP card, pinned notes, quick note)
-     5. Character sheet (form, bonuses, calculations)
-     6. Notes page (cards, pinning)
-     7. Compendium (dnd5eapi.co lookup)
-     8. Footer (pops up at the bottom of the page, erase data)
-     9. Startup
-
-   The page HTML lives in index.html. Elements are found by id, and
-   the data-* attributes below tell the event handlers what to do:
-     data-k     a sheet field saved in `character` under that key
-     data-adj   the Add / Set to value box for one sheet stat
-     data-act   a button on a note card (t = open/close, p = pin, d = delete)
-     data-f     a text box on a note card (title or body)
-     data-open  a pinned note on the home page (opens it in Notes)
-     data-u     a compendium result (the API path to load)
-   ===================================================================== */
-
-
 /* ---------------------------------------------------------------------
    1. Helpers and constants
-
-   $ and $$ are shorthand for querySelector and querySelectorAll ($$ returns a real array).
-
-   CHARACTER_KEY and NOTES_KEY are the localStorage names. They keep the "wf_" prefix
-   from before the app was renamed to Cantrip, so data saved earlier is still found.
-
-   readStorage and writeStorage never throw. Storage can be blocked (private mode), and
-   the app should keep working then, it just will not remember anything.
-
-   escapeHtml must wrap any user text placed inside an HTML string, so a "<" in a note
-   shows as text instead of becoming markup.
-
-   signed turns 3 into "+3" and -1 into "-1".
-
-   BOX is the shared Tailwind class list for the boxes on the character sheet.
    --------------------------------------------------------------------- */
 
 const $  = selector => document.querySelector(selector);
@@ -68,14 +28,6 @@ const BOX = 'box';
 
 /* ---------------------------------------------------------------------
    2. App state
-
-   character: an object of field key -> value, e.g. { name: 'Mira', level: '5', hp: '31' }.
-   Values are the strings the inputs hold; checkboxes hold true/false.
-
-   notes: [{ id, title, body, pinned }], newest first.
-
-   openNoteIds: ids of the note cards currently expanded on the Notes page. Not saved, so
-   cards start collapsed.
    --------------------------------------------------------------------- */
 
 let character = readStorage(CHARACTER_KEY) || {};
@@ -87,12 +39,9 @@ const openNoteIds = new Set();
 const saveCharacter = () => writeStorage(CHARACTER_KEY, character);
 const saveNotes     = () => writeStorage(NOTES_KEY, notes);
 
+
 /* ---------------------------------------------------------------------
    3. Navigation
-
-   showPage shows one page and hides the rest, highlights its nav button, and puts the
-   page name in the URL (#notes). Unknown names fall back to home. The home page displays
-   data owned by other pages, so it is redrawn every time you arrive.
    --------------------------------------------------------------------- */
 
 const PAGES = ['home', 'sheet', 'notes', 'compendium'];
@@ -102,8 +51,6 @@ function showPage(pageId) {
 
   $$('.sec').forEach(section => section.classList.toggle('on', section.id === pageId));
   $$('.nav').forEach(button  => button.classList.toggle('on', button.dataset.s === pageId));
-
-
 
   if (pageId === 'home') renderHome();
 }
@@ -115,25 +62,19 @@ $$('.nav').forEach(button => {
 
 /* ---------------------------------------------------------------------
    4. Home page
-
-   Dice roller (rollDice): clamps the amount to 1-100 and writes the cleaned value back to
-   the box, rolls each die, shows the total on the big die (the text shrinks as the number
-   gets longer), restarts the spin animation, and lists the individual rolls when more than
-   one die was rolled.
-
-   Summary cards (renderHome, renderPinnedNotes): the character line, the HP boxes, and the
-   pinned notes list. Each pinned note has a scrollable text area. Its title and its
-   "Open in Notes" link carry data-open.
-
-   HP boxes: the boxes here and the Hit points fields on the sheet are one value. Typing
-   here saves it and copies it into the sheet's field. The other direction happens when
-   renderHome runs on arrival.
-
-   Pinned note click: jumps to the Notes page with that card expanded.
-
-   Quick note: adds an unpinned note to the notes list. Pinning only happens on the Notes
-   page.
    --------------------------------------------------------------------- */
+const sfxRoll  = new Audio('assets/roll.mp3');
+const sfxNat1  = new Audio('assets/nat1.mp3');
+const sfxNat20 = new Audio('assets/nat20.mp3');
+
+sfxRoll.volume  = 0.3;
+sfxNat1.volume  = 0.8;
+sfxNat20.volume = 0.4;
+
+function playSound(sound) {
+  sound.currentTime = 0;
+  sound.play().catch(() => {});
+}
 
 function rollDice() {
   const count = Math.min(100, Math.max(1, parseInt($('#dn').value) || 1));
@@ -141,7 +82,7 @@ function rollDice() {
   $('#dn').value = count;
 
   let total, breakdownText;
-  let singleRoll = null;
+  let sound = sfxRoll;
 
   if (sides === 100) {
     const tensRoll = Math.floor(Math.random() * 10) * 10;
@@ -149,32 +90,17 @@ function rollDice() {
     total = (tensRoll === 0 && unitRoll === 0) ? 100 : tensRoll + unitRoll;
     const tensDisplay = tensRoll === 0 ? '00' : tensRoll;
     breakdownText = `<div class="mt-1 break-words">Tens (${tensDisplay}) + Units (${unitRoll}) = ${total}</div>`;
-
-    sfxRoll.currentTime = 0;
-    sfxRoll.play().catch(() => {});
   } else {
     const rolls = Array.from({ length: count }, () => 1 + Math.floor(Math.random() * sides));
     total = rolls.reduce((sum, value) => sum + value, 0);
     breakdownText = count > 1 ? `<div class="mt-1 break-words">${rolls.join(', ')}</div>` : '';
 
     if (sides === 20 && count === 1) {
-      singleRoll = rolls[0];
-      if (singleRoll === 1) {
-        sfxNat1.currentTime = 0;
-        sfxNat1.play().catch(() => {});
-      } else if (singleRoll === 20) {
-        sfxNat20.currentTime = 0;
-        sfxNat20.play().catch(() => {});
-      } else {
-        sfxRoll.currentTime = 0;
-        sfxRoll.play().catch(() => {});
-      }
-    } else {
-      // Standard roll sound for multi-dice or other die types
-      sfxRoll.currentTime = 0;
-      sfxRoll.play().catch(() => {});
+      if (rolls[0] === 1) sound = sfxNat1;
+      else if (rolls[0] === 20) sound = sfxNat20;
     }
   }
+  playSound(sound);
 
   const die = $('#die');
   const digits = String(total).length;
@@ -185,11 +111,10 @@ function rollDice() {
   void die.offsetWidth;
   die.classList.add('roll');
 
-  let rollLabel = count > 1 && sides !== 100 ? `${count}d${sides}` : 'Roll';
-
+  const rollLabel = count > 1 && sides !== 100 ? `${count}d${sides}` : 'Roll';
   $('#rollOut').innerHTML =
     `<div class="f text-3xl text-bone">${rollLabel} = ${total}</div>${breakdownText}`;
-    
+
   console.log(`Rolled ${total}`, sides);
 }
 
@@ -197,18 +122,10 @@ $('#rollBtn').onclick = rollDice;
 $('#die').onclick = rollDice;
 $('#dn').onkeydown = event => { if (event.key === 'Enter') rollDice(); };
 
-const sfxRoll = new Audio('assets/roll.mp3');
-const sfxNat1 = new Audio('assets/nat1.mp3');
-const sfxNat20 = new Audio('assets/nat20.mp3');
-
-sfxRoll.volume = 0.6;
-sfxNat1.volume = 0.8;
-sfxNat20.volume = 0.8;
-
 function renderHome() {
   $('#hnMsg').textContent = '';
 
-  $('#h-char').textContent = character.name || 'Create a character.';
+  $('#h-char').textContent = character.name || 'Unnamed character.';
   $('#h-sub').textContent =
     [character.race, character.cls, character.level ? 'level ' + character.level : '']
       .filter(Boolean).join(' ') || 'Fill in your sheet to see it here';
@@ -229,11 +146,11 @@ function renderPinnedNotes() {
   }
 
   $('#h-pins').innerHTML = pinned.map(note => `
-    <div class="wrap flex flex-col bg-ink border border-edge rounded p-3 min-h-[9rem]">
-      <button data-open="${note.id}" class="wrap f text-xl text-left hover:text-ember">${escapeHtml(noteTitle(note))}</button>
+    <div class="wrap flex flex-col h-72">
+      <button data-open="${note.id}" class="wrap f text-xl text-left hover:text-ember shrink-0">${escapeHtml(noteTitle(note))}</button>
       <div tabindex="0" role="region" aria-label="Text of ${escapeHtml(noteTitle(note))}"
-           class="wrap scroll flex-1 mt-2 max-h-48 text-dim whitespace-pre-wrap">${escapeHtml(note.body) || 'Empty note.'}</div>
-      <button data-open="${note.id}" class="self-start mt-2 text-sm text-verd underline">Open in Notes</button>
+           class="wrap scroll flex-1 min-h-0 my-2 text-dim whitespace-pre-wrap">${escapeHtml(note.body) || 'Empty note.'}</div>
+      <button data-open="${note.id}" class="self-start text-sm text-verd underline shrink-0">Open in Notes</button>
     </div>`).join('');
 }
 
@@ -269,17 +186,9 @@ $('#hnAdd').onclick = () => {
   $('#hnMsg').textContent = 'Added to Notes. Pin it there to show it here.';
 };
 
+
 /* ---------------------------------------------------------------------
    5. Character sheet
-
-   The form is built by buildSheet instead of being written in index.html, because
-   abilities, saving throws and skills repeat the same markup. Any element with
-   data-k="key" is saved in `character` under that key as you type, and filled from it on
-   load.
-
-   ABILITIES and SKILLS are the rules data. A skill's position in SKILLS is its id
-   (sk_0 ... sk_17) and saved skill data points at that position, so new skills go at the
-   end of the list.
    --------------------------------------------------------------------- */
 
 const ABILITIES = [
@@ -296,11 +205,6 @@ const SKILLS = [
 ];
 const PERCEPTION = SKILLS.findIndex(([name]) => name === 'Perception');
 
-/*
-   Form builders. textField is a labelled input saved under its key. adjustControl is the
-   Add / Set to dropdown plus one number box that every adjustable stat gets. derivedStat is
-   a calculated value with its adjustControl and a note line underneath.
- */
 const textField = (key, label, type = 'text') =>
   `<label class="block text-sm text-dim">${label}<input data-k="${key}" type="${type}" class="w-full text-bone"></label>`;
 
@@ -320,22 +224,6 @@ const derivedStat = (valueId, label, key, startingText) => `
     <div id="n-${key}" class="text-xs"></div>
   </div>`;
 
-/*
-   Adjustments. For a stat with key K, three values are saved in `character`:
-     bn_K  the Add number
-     ov_K  the Set to number
-     md_K  which one is active, 'add' or 'set'
-   Switching modes never deletes the other number, it just stops using it.
-
-   Stat keys: str ... cha (ability scores), sv_str ... sv_cha (saving throws),
-   sk_0 ... sk_17 (skills), init, pb (proficiency bonus), pp (passive perception).
-
-   setValueOf returns null when the Set to box is empty. modeOf treats data saved before
-   modes existed (a Set to number and no mode) as 'set'. applyAdjustment gives the final
-   value: in 'set' mode the Set to number (or the calculated value if it is empty),
-   otherwise calculated + Add. unusedValueNote makes the "kept, not applied" text.
-   syncAdjustBox shows the active mode's number in the stat's box.
- */
 function addValueOf(key) {
   return Number(character['bn_' + key]) || 0;
 }
@@ -366,10 +254,6 @@ function syncAdjustBox(key) {
   if (box) box.value = character[(modeOf(key) === 'set' ? 'ov_' : 'bn_') + key] ?? '';
 }
 
-/*
-   buildSheet writes the whole form, fills every field from `character` (selects take their
-   mode from modeOf), then recalculates. It runs at startup and again after the erase button.
- */
 function buildSheet() {
   $('#sheetBody').innerHTML = `
   <div class="${BOX} grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -455,19 +339,6 @@ function buildSheet() {
   recalculateSheet();
 }
 
-/*
-   recalculateSheet runs after every change and fills in everything that is not typed:
-     proficiency bonus   2 + floor((level - 1) / 4), level clamped to 1-20,
-                         so +2 at levels 1-4 up to +6 at levels 17-20
-     ability modifier    floor((score - 10) / 2)
-     saving throw        ability modifier, plus proficiency if the box is ticked
-     skill               modifier of the skill's ability, plus proficiency if ticked
-     initiative          Dexterity modifier
-     passive perception  10 + the Perception skill bonus
-   Every result goes through applyAdjustment. The note lines under each stat say where
-   proficiency comes from ("Level 9 gives +4", or "would give" when Set to overrides it)
-   and mention saved numbers that are not in use.
- */
 function recalculateSheet() {
   const level = Math.min(20, Math.max(1, Number(character.level) || 1));
   const levelBonus = 2 + Math.floor((level - 1) / 4);
@@ -511,11 +382,6 @@ function recalculateSheet() {
   });
 }
 
-/*
-   One listener handles every input on the sheet. The number box (data-adj) writes to the
-   Set to or Add number depending on the mode. Any other field writes under its data-k.
-   Changing a mode dropdown also swaps the number shown in its box.
- */
 $('#sheetBody').addEventListener('input', event => {
   const target = event.target;
 
@@ -533,20 +399,9 @@ $('#sheetBody').addEventListener('input', event => {
   recalculateSheet();
 });
 
+
 /* ---------------------------------------------------------------------
    6. Notes page
-
-   renderNotes redraws every card. Open cards show an editable title and text, closed cards
-   show a title and a two-line preview. Typing in a card saves but does not redraw, so the
-   cursor never jumps. Only opening, closing, pinning and deleting redraw.
-
-   Card buttons use data-act: t opens or closes, p pins or unpins, d deletes (after a
-   confirm). Card fields use data-f ('title' or 'body') and data-id.
-
-   addNote creates a card, opens it and focuses its text area.
-
-   A note is pinned only from this page. Pinned cards get an orange border and appear on
-   the home page.
    --------------------------------------------------------------------- */
 
 const noteTitle = note => note.title || 'Untitled';
@@ -628,21 +483,9 @@ $('#grid').addEventListener('input', event => {
   if (note) { note[field] = event.target.value; saveNotes(); }
 });
 
+
 /* ---------------------------------------------------------------------
    7. Compendium
-
-   Data comes from dnd5eapi.co. CATEGORIES fills the dropdown, and each name must match an
-   API path under API_VERSION_PATH.
-
-   renderResults downloads the chosen category's list once, keeps it in categoryCache, and
-   filters it in the browser as you type. Clicking a result (data-u) fetches that one entry
-   into the detail panel.
-
-   renderApiValue prints an entry without knowing its shape: text and numbers as they are,
-   lists of text as paragraphs, lists of { name, desc } as "Name. description", references
-   like { name, url } as just the name, and any other object as "label: value" lines.
-   HIDDEN_API_FIELDS are internal and skipped. The top-level name is skipped too, because
-   it is already the heading.
    --------------------------------------------------------------------- */
 
 const API_ROOT = 'https://www.dnd5eapi.co';
@@ -731,12 +574,11 @@ $('#res').addEventListener('click', async event => {
 $('#cat').onchange = renderResults;
 $('#q').oninput = renderResults;
 
+
 /* ---------------------------------------------------------------------
    8. Footer
-
-   The footer sits at the end of the document.The erase button lives here. It removes both saved items,
-   resets the in-memory state, rebuilds the sheet and notes, and returns to the home page.
    --------------------------------------------------------------------- */
+
 $('#wipe').onclick = () => {
   if (!confirm('Erase your character sheet and all notes? This cannot be undone.')) return;
 
@@ -755,9 +597,6 @@ $('#wipe').onclick = () => {
 
 /* ---------------------------------------------------------------------
    9. Startup
-
-   Builds the sheet, notes and compendium list, then opens the page named in the URL
-   (home if there is none).
    --------------------------------------------------------------------- */
 
 buildSheet();

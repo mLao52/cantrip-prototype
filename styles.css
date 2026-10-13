@@ -1,27 +1,169 @@
-body{font-family:Alegreya,Georgia,serif;font-size:18px}
-.f{font-family:Almendra,Georgia,serif}
-
-input,textarea,select{background:#14171f;border:1px solid #323a4b;border-radius:.375rem;padding:.3rem .5rem;color:#e8e2d0;font:inherit}
-input:focus,textarea:focus,select:focus,button:focus-visible{outline:2px solid #4fb3a5;outline-offset:1px}
-input[type=checkbox]{accent-color:#4fb3a5;width:1.1rem;height:1.1rem;padding:0}
-
-/* section switching */
-.sec{display:none}
-.sec.on{display:block}
-
-/* top navigation */
-.nav{padding:.5rem .9rem;border-bottom:2px solid transparent;color:#9a9fae}
-.nav.on{color:#e8e2d0;border-bottom-color:#4fb3a5}
-
-/* d20 on the home page */
-.d20{clip-path:polygon(50% 0,95% 25%,95% 75%,50% 100%,5% 75%,5% 25%)}
-@media (prefers-reduced-motion:no-preference){
-  .roll{animation:r .4s}
-  @keyframes r{from{transform:rotate(-120deg) scale(.8)}to{transform:none}}
+:root {
+  --ink: #283126;     /* Cozy mid-tone forest moss background */
+  --panel: #333e2f;   /* Elevated woodland green for cards, header, and footer */
+  --edge: #4f5f48;    /* Muted olive-sage border */
+  --bone: #f2ede1;    /* Warm parchment cream text */
+  --dim: #a6b5a0;     /* Muted sage-taupe for secondary text */
+  --verd: #75a165;    /* Vibrant leaf-sage accent */
+  --ember: #d48250;   /* Warm terracotta accent */
 }
 
-/* long unbroken text must wrap inside its card instead of bleeding out */
-.wrap{overflow-wrap:anywhere;min-width:0}
+body {
+  font-family: Alegreya, Georgia, serif;
+  font-size: 18px;
+  background-color: var(--ink);
+  color: var(--bone);
+  min-height: 100vh;
+}
 
-/* scrollable text areas inside cards */
-.scroll{overflow-y:auto;scrollbar-width:thin;scrollbar-color:#4fb3a5 #14171f}
+header {
+  background: var(--panel);
+  border-bottom: 1px solid var(--edge);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+footer {
+  background: var(--panel);
+  border-top: 1px solid var(--edge);
+  font-size: 0.85rem;
+  padding: 0.2rem 0;
+}
+
+footer h2 {
+  font-size: 1.25rem !important;
+  margin-bottom: 0.25rem !important;
+}
+
+.f {
+  font-family: Almendra, Georgia, serif;
+}
+
+/* Form controls - mid-tone woodland green tones */
+input, textarea, select {
+  background: #232a21; /* Slightly deeper green shadow for inputs */
+  border: 1px solid var(--edge);
+  border-radius: .375rem;
+  padding: .3rem .5rem;
+  color: var(--bone);
+  font: inherit;
+}
+
+input:focus, textarea:focus, select:focus, button:focus-visible {
+  outline: 2px solid var(--verd);
+  outline-offset: 1px;
+}
+
+input[type=checkbox] {
+  accent-color: var(--verd);
+  width: 1.1rem;
+  height: 1.1rem;
+  padding: 0;
+}
+
+/* Section switching */
+.sec { display: none; }
+.sec.on { display: block; }
+
+/* Top navigation */
+.nav {
+  padding: .5rem .9rem;
+  border-bottom: 2px solid transparent;
+  color: var(--dim);
+}
+
+.nav.on {
+  color: var(--bone);
+  border-bottom-color: var(--verd);
+}
+
+.d20 {
+  clip-path: polygon(50% 0%, 95% 25%, 95% 75%, 50% 100%, 5% 75%, 5% 25%);
+  background-color: #283126;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3C!-- Outer Hexagon Border --%3E%3Cpolygon points='50,2 95,27 95,73 50,98 5,73 5,27' fill='%23283126' stroke='%23f2ede1' stroke-width='2'/%3E%3C!-- Central Triangle Face (Where your roll number sits) --%3E%3Cpolygon points='50,2 28,50 72,50' fill='%23384533' stroke='%23f2ede1' stroke-width='1.2'/%3E%3C!-- Surrounding Facet Triangles --%3E%3Cpolygon points='50,2 72,50 95,27' fill='%232f3b2a' stroke='%23f2ede1' stroke-width='1.2'/%3E%3Cpolygon points='95,27 72,50 95,73' fill='%23384533' stroke='%23f2ede1' stroke-width='1.2'/%3E%3Cpolygon points='95,73 72,50 50,98' fill='%232f3b2a' stroke='%23f2ede1' stroke-width='1.2'/%3E%3Cpolygon points='50,98 72,50 50,98' fill='%23384533' stroke='%23f2ede1' stroke-width='1.2'/%3E%3Cpolygon points='50,98 28,50 50,98' fill='%23384533' stroke='%23f2ede1' stroke-width='1.2'/%3E%3Cpolygon points='50,98 5,73 28,50' fill='%232f3b2a' stroke='%23f2ede1' stroke-width='1.2'/%3E%3Cpolygon points='5,73 28,50 5,27' fill='%23384533' stroke='%23f2ede1' stroke-width='1.2'/%3E%3Cpolygon points='5,27 28,50 50,2' fill='%232f3b2a' stroke='%23f2ede1' stroke-width='1.2'/%3E%3C/svg%3E");
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.d20:hover {
+  filter: brightness(1.12);
+  transform: translateY(-2px) scale(1.02);
+}
+
+.d20:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .roll { animation: r .4s; }
+  @keyframes r {
+    from { transform: rotate(-120deg) scale(.8); }
+    to { transform: none; }
+  }
+}
+
+/* Long unbroken text wrapping */
+.wrap {
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+
+/* Scrollable text areas */
+.scroll {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--verd) #232a21; /* Sage scrollbar on dark green track */
+}
+
+/* Global Custom Scrollbars for the entire site */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--verd) #232a21;
+}
+
+/* WebKit scrollbar styling for Chrome, Edge, and Safari */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #232a21;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--verd);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #5d8450;
+}
+
+.box {
+  position: relative;
+  background-color: var(--panel);
+  border-width: 1px;
+  border-style: solid;
+  border-color: var(--edge);
+  border-radius: .25rem;
+  padding: 1rem;
+  box-shadow: inset 0 1px 2px rgba(242, 237, 225, 0.04);
+  overflow: hidden;
+}
+
+.box::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("assets/parchment.jpg");
+  background-size: cover;
+  background-position: center;
+  opacity: 0.2;
+  pointer-events: none;
+}

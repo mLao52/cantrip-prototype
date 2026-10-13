@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cantrip</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config = {
+  theme:{
+     extend:{
+      colors:{
+        ink:'#14171f',
+        panel:'#1d222e',
+        edge:'#323a4b',
+        bone:'#e8e2d0',
+        dim:'#9a9fae',
+        verd:'#4fb3a5',
+        ember:'#d9822b'
+        }
+      }
+    }
+  }
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&family=Alegreya:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-ink text-bone min-h-screen">
+<header class="border-b border-edge bg-panel sticky top-0 z-10">
+  <div class="max-w-6xl mx-auto px-4 flex flex-wrap items-center justify-between">
+    <span class="f text-4xl py-2">Cantrip</span>
+    <nav class="flex flex-wrap">
+      <button class="nav" data-s="home">Home</button>
+      <button class="nav" data-s="sheet">Character sheet</button>
+      <button class="nav" data-s="notes">Notes</button>
+      <button class="nav" data-s="compendium">Compendium</button>
+      <button class="nav" data-s="about">About</button>
+    </nav>
+  </div>
+</header>
+
+<main class="max-w-6xl mx-auto px-4 py-8">
+
+<section id="home" class="sec">
+  <div class="grid md:grid-cols-2 gap-8 items-center py-6">
+    <div>
+      <h1 class="f text-5xl md:text-6xl leading-tight">Roll the dice</h1>
+      <div class="mt-6 flex flex-wrap items-end gap-3">
+        <label class="text-sm text-dim">How many<input id="dn" type="number" min="1" max="100" value="1" class="block w-24 text-xl"></label>
+        <label class="text-sm text-dim">Dice type
+          <select id="dt" class="block text-xl">
+            <option value="4">d4</option><option value="6">d6</option><option value="8">d8</option>
+            <option value="10">d10</option><option value="12">d12</option><option value="20" selected>d20</option><option value="100">d100</option>
+          </select>
+        </label>
+        <button id="rollBtn" class="px-6 py-2 rounded bg-verd text-ink font-bold text-xl">Roll</button>
+      </div>
+      <div id="rollOut" class="mt-6 text-dim min-h-[4rem]" aria-live="polite">Choose how many dice and which type, then press Roll.</div>
+    </div>
+    <div class="flex flex-col items-center gap-3">
+      <button id="die" class="d20 bg-panel hover:bg-edge w-56 h-56 f text-7xl text-verd" aria-label="Roll the dice again">20</button>
+      <p class="text-dim">Tap the die to roll again.</p>
+    </div>
+  </div>
+  <div class="grid sm:grid-cols-2 gap-4 mt-6">
+    <div class="bg-panel border border-edge rounded p-4"><div class="text-dim">Character</div><div id="h-char" class="f text-2xl mt-1"></div><div id="h-sub" class="text-dim"></div></div>
+    <div class="bg-panel border border-edge rounded p-4">
+      <div class="text-dim">Hit points (current / maximum)</div>
+      <div class="flex items-center gap-2 mt-1 f text-3xl text-ember">
+        <input id="h-hp" type="number" class="w-24 text-center" aria-label="Current hit points">
+        <span aria-hidden="true">/</span>
+        <input id="h-hpmax" type="number" class="w-24 text-center" aria-label="Maximum hit points">
+      </div>
+    </div>
+  </div>
+  <div class="bg-panel border border-edge rounded p-4 mt-4">
+    <h2 class="f text-2xl mb-3">Pinned notes</h2>
+    <div id="h-pins" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 items-start"></div>
+    <div class="mt-4 pt-4 border-t border-edge grid gap-2">
+      <label class="text-sm text-dim">Quick note<input id="hnT" class="w-full text-bone" placeholder="Title"></label>
+      <textarea id="hnB" rows="2" class="w-full" placeholder="Text (optional)" aria-label="Quick note text"></textarea>
+      <div class="flex items-center gap-3">
+        <button id="hnAdd" class="px-4 py-2 rounded bg-verd text-ink font-bold">Add to Notes</button>
+        <span id="hnMsg" class="text-dim text-sm" aria-live="polite"></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="sheet" class="sec">
+  <h2 class="f text-4xl mb-5">Character sheet</h2>
+  <div id="sheetBody" class="space-y-5"></div>
+</section>
+
+<section id="notes" class="sec">
+  <h2 class="f text-4xl mb-2">Notes</h2>
+  <p class="text-dim mb-4">Add a card, then tap it to open and write inside.</p>
+  <div class="flex gap-2 mb-6">
+    <input id="nt" class="flex-1" placeholder="Card title, e.g. Session 4: the sunken vault">
+    <button id="addNote" class="px-4 py-2 rounded bg-verd text-ink font-bold">Add card</button>
+  </div>
+  <div id="grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-4 items-start"></div>
+</section>
+
+<section id="compendium" class="sec">
+  <h2 class="f text-4xl mb-2">Compendium</h2>
+  <p class="text-dim mb-4">Search the 5e SRD, powered by dnd5eapi.co.</p>
+  <div class="flex flex-wrap gap-2 mb-4">
+    <select id="cat"></select>
+    <input id="q" class="flex-1 min-w-[12rem]" placeholder="Search by name, e.g. fireball" autocomplete="off">
+  </div>
+  <div class="grid md:grid-cols-5 gap-5">
+    <div id="res" class="md:col-span-2 bg-panel border border-edge rounded p-2 max-h-[65vh] overflow-y-auto"></div>
+    <article id="det" class="md:col-span-3 bg-panel border border-edge rounded p-5 min-h-[10rem] max-h-[65vh] overflow-y-auto text-dim">Pick a result to read it here.</article>
+  </div>
+</section>
+
+<section id="about" class="sec max-w-prose">
+  <h2 class="f text-4xl mb-4">About</h2>
+  <div class="space-y-4 leading-relaxed">
+    <p>The Wayfarer's Folio is a small companion for 5th Edition games. It has a self-calculating character sheet, expandable session notes, and a rules compendium.</p>
+    <p>Your sheet and notes are stored in this browser's local storage. Nothing is sent to a server, and clearing your browser data will erase them.</p>
+    <p>Compendium entries come from the free <a class="text-verd underline" href="https://www.dnd5eapi.co" target="_blank" rel="noopener">D&amp;D 5e API</a>, which serves content from the System Reference Document. It needs an internet connection.</p>
+    <p class="text-dim">Built with plain JavaScript and Tailwind CSS.</p>
+    <button id="wipe" class="px-4 py-2 rounded border border-ember text-ember hover:bg-ember hover:text-ink">Erase sheet and notes</button>
+  </div>
+</section>
+
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>

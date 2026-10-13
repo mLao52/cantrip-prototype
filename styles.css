@@ -1,0 +1,27 @@
+body{font-family:Alegreya,Georgia,serif;font-size:18px}
+.f{font-family:Almendra,Georgia,serif}
+
+input,textarea,select{background:#14171f;border:1px solid #323a4b;border-radius:.375rem;padding:.3rem .5rem;color:#e8e2d0;font:inherit}
+input:focus,textarea:focus,select:focus,button:focus-visible{outline:2px solid #4fb3a5;outline-offset:1px}
+input[type=checkbox]{accent-color:#4fb3a5;width:1.1rem;height:1.1rem;padding:0}
+
+/* section switching */
+.sec{display:none}
+.sec.on{display:block}
+
+/* top navigation */
+.nav{padding:.5rem .9rem;border-bottom:2px solid transparent;color:#9a9fae}
+.nav.on{color:#e8e2d0;border-bottom-color:#4fb3a5}
+
+/* d20 on the home page */
+.d20{clip-path:polygon(50% 0,95% 25%,95% 75%,50% 100%,5% 75%,5% 25%)}
+@media (prefers-reduced-motion:no-preference){
+  .roll{animation:r .4s}
+  @keyframes r{from{transform:rotate(-120deg) scale(.8)}to{transform:none}}
+}
+
+/* long unbroken text must wrap inside its card instead of bleeding out */
+.wrap{overflow-wrap:anywhere;min-width:0}
+
+/* scrollable text areas inside cards */
+.scroll{overflow-y:auto;scrollbar-width:thin;scrollbar-color:#4fb3a5 #14171f}

@@ -1,11 +1,16 @@
 :root {
-  --ink: #283126;     /* Cozy mid-tone forest moss background */
-  --panel: #333e2f;   /* Elevated woodland green for cards, header, and footer */
-  --edge: #4f5f48;    /* Muted olive-sage border */
-  --bone: #f2ede1;    /* Warm parchment cream text */
-  --dim: #a6b5a0;     /* Muted sage-taupe for secondary text */
-  --verd: #75a165;    /* Vibrant leaf-sage accent */
-  --ember: #d48250;   /* Warm terracotta accent */
+  --ink: #283126;
+  --panel: #333e2f;
+  --edge: #4f5f48;
+  --bone: #f2ede1;
+  --dim: #a6b5a0;
+  --verd: #75a165;
+  --ember: #d48250;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--verd) #232a21;
 }
 
 body {
@@ -17,18 +22,44 @@ body {
 }
 
 header {
+  position: relative;
   background: var(--panel);
   border-bottom: 1px solid var(--edge);
   position: sticky;
   top: 0;
   z-index: 10;
+  overflow: hidden;
+}
+
+header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("assets/parchment.jpg");
+  background-size: cover;
+  background-position: center;
+  opacity: 0.05;
+  pointer-events: none;
 }
 
 footer {
+  position: relative;
   background: var(--panel);
   border-top: 1px solid var(--edge);
   font-size: 0.85rem;
-  padding: 0.2rem 0;
+  padding: 0.75rem 0;
+  overflow: hidden;
+}
+
+footer::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("assets/parchment.jpg");
+  background-size: cover;
+  background-position: center;
+  opacity: 0.05;
+  pointer-events: none;
 }
 
 footer h2 {
@@ -40,9 +71,8 @@ footer h2 {
   font-family: Almendra, Georgia, serif;
 }
 
-/* Form controls - mid-tone woodland green tones */
 input, textarea, select {
-  background: #232a21; /* Slightly deeper green shadow for inputs */
+  background: #232a21;
   border: 1px solid var(--edge);
   border-radius: .375rem;
   padding: .3rem .5rem;
@@ -62,11 +92,9 @@ input[type=checkbox] {
   padding: 0;
 }
 
-/* Section switching */
 .sec { display: none; }
 .sec.on { display: block; }
 
-/* Top navigation */
 .nav {
   padding: .5rem .9rem;
   border-bottom: 2px solid transparent;
@@ -81,7 +109,7 @@ input[type=checkbox] {
 .d20 {
   clip-path: polygon(50% 0%, 95% 25%, 95% 75%, 50% 100%, 5% 75%, 5% 25%);
   background-color: #283126;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3C!-- Outer Hexagon Border --%3E%3Cpolygon points='50,2 95,27 95,73 50,98 5,73 5,27' fill='%23283126' stroke='%23f2ede1' stroke-width='2'/%3E%3C!-- Central Triangle Face (Where your roll number sits) --%3E%3Cpolygon points='50,2 28,50 72,50' fill='%23384533' stroke='%23f2ede1' stroke-width='1.2'/%3E%3C!-- Surrounding Facet Triangles --%3E%3Cpolygon points='50,2 72,50 95,27' fill='%232f3b2a' stroke='%23f2ede1' stroke-width='1.2'/%3E%3Cpolygon points='95,27 72,50 95,73' fill='%23384533' stroke='%23f2ede1' stroke-width='1.2'/%3E%3Cpolygon points='95,73 72,50 50,98' fill='%232f3b2a' stroke='%23f2ede1' stroke-width='1.2'/%3E%3Cpolygon points='50,98 72,50 50,98' fill='%23384533' stroke='%23f2ede1' stroke-width='1.2'/%3E%3Cpolygon points='50,98 28,50 50,98' fill='%23384533' stroke='%23f2ede1' stroke-width='1.2'/%3E%3Cpolygon points='50,98 5,73 28,50' fill='%232f3b2a' stroke='%23f2ede1' stroke-width='1.2'/%3E%3Cpolygon points='5,73 28,50 5,27' fill='%23384533' stroke='%23f2ede1' stroke-width='1.2'/%3E%3Cpolygon points='5,27 28,50 50,2' fill='%232f3b2a' stroke='%23f2ede1' stroke-width='1.2'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='50,2 95,27 95,73 50,98 5,73 5,27' fill='%23283126' stroke='%23f2ede1' stroke-width='2'/%3E%3Cpolygon points='50,2 28,50 72,50' fill='%23384533' stroke='%23f2ede1' stroke-width='1.2'/%3E%3Cpolygon points='50,2 72,50 95,27' fill='%232f3b2a' stroke='%23f2ede1' stroke-width='1.2'/%3E%3Cpolygon points='95,27 72,50 95,73' fill='%23384533' stroke='%23f2ede1' stroke-width='1.2'/%3E%3Cpolygon points='95,73 72,50 50,98' fill='%232f3b2a' stroke='%23f2ede1' stroke-width='1.2'/%3E%3Cpolygon points='50,98 72,50 50,98' fill='%23384533' stroke='%23f2ede1' stroke-width='1.2'/%3E%3Cpolygon points='50,98 28,50 50,98' fill='%23384533' stroke='%23f2ede1' stroke-width='1.2'/%3E%3Cpolygon points='50,98 5,73 28,50' fill='%232f3b2a' stroke='%23f2ede1' stroke-width='1.2'/%3E%3Cpolygon points='5,73 28,50 5,27' fill='%23384533' stroke='%23f2ede1' stroke-width='1.2'/%3E%3Cpolygon points='5,27 28,50 50,2' fill='%232f3b2a' stroke='%23f2ede1' stroke-width='1.2'/%3E%3C/svg%3E");
   background-size: cover;
   background-position: center;
   display: flex;
@@ -107,26 +135,11 @@ input[type=checkbox] {
   }
 }
 
-/* Long unbroken text wrapping */
 .wrap {
   overflow-wrap: anywhere;
   min-width: 0;
 }
 
-/* Scrollable text areas */
-.scroll {
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: var(--verd) #232a21; /* Sage scrollbar on dark green track */
-}
-
-/* Global Custom Scrollbars for the entire site */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: var(--verd) #232a21;
-}
-
-/* WebKit scrollbar styling for Chrome, Edge, and Safari */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -143,6 +156,10 @@ input[type=checkbox] {
 
 ::-webkit-scrollbar-thumb:hover {
   background-color: #5d8450;
+}
+
+.scroll {
+  overflow-y: auto;
 }
 
 .box {
@@ -164,6 +181,6 @@ input[type=checkbox] {
   background-image: url("assets/parchment.jpg");
   background-size: cover;
   background-position: center;
-  opacity: 0.2;
+  opacity: 0.15;
   pointer-events: none;
 }

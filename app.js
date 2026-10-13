@@ -140,8 +140,41 @@ function rollDice() {
   const sides = Number($('#dt').value);
   $('#dn').value = count;
 
-  const rolls = Array.from({ length: count }, () => 1 + Math.floor(Math.random() * sides));
-  const total = rolls.reduce((sum, value) => sum + value, 0);
+  let total, breakdownText;
+  let singleRoll = null;
+
+  if (sides === 100) {
+    const tensRoll = Math.floor(Math.random() * 10) * 10;
+    const unitRoll = Math.floor(Math.random() * 10);
+    total = (tensRoll === 0 && unitRoll === 0) ? 100 : tensRoll + unitRoll;
+    const tensDisplay = tensRoll === 0 ? '00' : tensRoll;
+    breakdownText = `<div class="mt-1 break-words">Tens (${tensDisplay}) + Units (${unitRoll}) = ${total}</div>`;
+
+    sfxRoll.currentTime = 0;
+    sfxRoll.play().catch(() => {});
+  } else {
+    const rolls = Array.from({ length: count }, () => 1 + Math.floor(Math.random() * sides));
+    total = rolls.reduce((sum, value) => sum + value, 0);
+    breakdownText = count > 1 ? `<div class="mt-1 break-words">${rolls.join(', ')}</div>` : '';
+
+    if (sides === 20 && count === 1) {
+      singleRoll = rolls[0];
+      if (singleRoll === 1) {
+        sfxNat1.currentTime = 0;
+        sfxNat1.play().catch(() => {});
+      } else if (singleRoll === 20) {
+        sfxNat20.currentTime = 0;
+        sfxNat20.play().catch(() => {});
+      } else {
+        sfxRoll.currentTime = 0;
+        sfxRoll.play().catch(() => {});
+      }
+    } else {
+      // Standard roll sound for multi-dice or other die types
+      sfxRoll.currentTime = 0;
+      sfxRoll.play().catch(() => {});
+    }
+  }
 
   const die = $('#die');
   const digits = String(total).length;
@@ -152,16 +185,25 @@ function rollDice() {
   void die.offsetWidth;
   die.classList.add('roll');
 
-  const breakdown = count > 1 ? `<div class="mt-1 break-words">${rolls.join(', ')}</div>` : '';
+  let rollLabel = count > 1 && sides !== 100 ? `${count}d${sides}` : 'Roll';
+
   $('#rollOut').innerHTML =
-    `<div class="f text-3xl text-bone">${count}d${sides} = ${total}</div>${breakdown}`;
+    `<div class="f text-3xl text-bone">${rollLabel} = ${total}</div>${breakdownText}`;
     
-  console.log(`${count}d${sides} = ${total}`, rolls);
+  console.log(`Rolled ${total}`, sides);
 }
 
 $('#rollBtn').onclick = rollDice;
 $('#die').onclick = rollDice;
 $('#dn').onkeydown = event => { if (event.key === 'Enter') rollDice(); };
+
+const sfxRoll = new Audio('assets/roll.mp3');
+const sfxNat1 = new Audio('assets/nat1.mp3');
+const sfxNat20 = new Audio('assets/nat20.mp3');
+
+sfxRoll.volume = 0.6;
+sfxNat1.volume = 0.8;
+sfxNat20.volume = 0.8;
 
 function renderHome() {
   $('#hnMsg').textContent = '';

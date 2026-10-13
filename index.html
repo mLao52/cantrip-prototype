@@ -5,27 +5,11 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Cantrip</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<script>tailwind.config = {
-  theme:{
-     extend:{
-      colors:{
-        ink:'#14171f',
-        panel:'#1d222e',
-        edge:'#323a4b',
-        bone:'#e8e2d0',
-        dim:'#9a9fae',
-        verd:'#4fb3a5',
-        ember:'#d9822b'
-        }
-      }
-    }
-  }
-</script>
 <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&family=Alegreya:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 </head>
-<body class="bg-ink text-bone min-h-screen">
-<header class="border-b border-edge bg-panel sticky top-0 z-10">
+<body>
+<header>
   <div class="max-w-6xl mx-auto px-4 flex flex-wrap items-center justify-between">
     <span class="f text-4xl py-2">Cantrip</span>
     <nav class="flex flex-wrap">
@@ -33,12 +17,11 @@
       <button class="nav" data-s="sheet">Character sheet</button>
       <button class="nav" data-s="notes">Notes</button>
       <button class="nav" data-s="compendium">Compendium</button>
-      <button class="nav" data-s="about">About</button>
     </nav>
   </div>
 </header>
 
-<main class="max-w-6xl mx-auto px-4 py-8">
+<main class="max-w-6xl mx-auto px-4 py-8 pb-12">
 
 <section id="home" class="sec">
   <div class="grid md:grid-cols-2 gap-8 items-center py-6">
@@ -48,8 +31,13 @@
         <label class="text-sm text-dim">How many<input id="dn" type="number" min="1" max="100" value="1" class="block w-24 text-xl"></label>
         <label class="text-sm text-dim">Dice type
           <select id="dt" class="block text-xl">
-            <option value="4">d4</option><option value="6">d6</option><option value="8">d8</option>
-            <option value="10">d10</option><option value="12">d12</option><option value="20" selected>d20</option><option value="100">d100</option>
+            <option value="4">d4</option>
+            <option value="6">d6</option>
+            <option value="8">d8</option>
+            <option value="10">d10</option>
+            <option value="12">d12</option>
+            <option value="20" selected>d20</option>
+            <option value="100">d100</option>
           </select>
         </label>
         <button id="rollBtn" class="px-6 py-2 rounded bg-verd text-ink font-bold text-xl">Roll</button>
@@ -62,8 +50,11 @@
     </div>
   </div>
   <div class="grid sm:grid-cols-2 gap-4 mt-6">
-    <div class="bg-panel border border-edge rounded p-4"><div class="text-dim">Character</div><div id="h-char" class="f text-2xl mt-1"></div><div id="h-sub" class="text-dim"></div></div>
-    <div class="bg-panel border border-edge rounded p-4">
+    <div class="bg-panel border border-edge rounded p-4 box">
+      <div class="text-dim">Character</div>
+      <div id="h-char" class="f text-2xl mt-1"></div>
+      <div id="h-sub" class="text-dim"></div></div>
+    <div class="bg-panel border border-edge rounded p-4 box">
       <div class="text-dim">Hit points (current / maximum)</div>
       <div class="flex items-center gap-2 mt-1 f text-3xl text-ember">
         <input id="h-hp" type="number" class="w-24 text-center" aria-label="Current hit points">
@@ -72,7 +63,7 @@
       </div>
     </div>
   </div>
-  <div class="bg-panel border border-edge rounded p-4 mt-4">
+  <div class="bg-panel border border-edge rounded p-4 mt-4 box">
     <h2 class="f text-2xl mb-3">Pinned notes</h2>
     <div id="h-pins" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 items-start"></div>
     <div class="mt-4 pt-4 border-t border-edge grid gap-2">
@@ -95,10 +86,10 @@
   <h2 class="f text-4xl mb-2">Notes</h2>
   <p class="text-dim mb-4">Add a card, then tap it to open and write inside.</p>
   <div class="flex gap-2 mb-6">
-    <input id="nt" class="flex-1" placeholder="Card title, e.g. Session 4: the sunken vault">
+    <input id="nt" class="flex-1" placeholder="Write something down... "">
     <button id="addNote" class="px-4 py-2 rounded bg-verd text-ink font-bold">Add card</button>
   </div>
-  <div id="grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-4 items-start"></div>
+  <div id="grid" class="grid md:grid-cols-2 lg:grid-cols-4 gap-4 items-start"></div>
 </section>
 
 <section id="compendium" class="sec">
@@ -110,22 +101,27 @@
   </div>
   <div class="grid md:grid-cols-5 gap-5">
     <div id="res" class="md:col-span-2 bg-panel border border-edge rounded p-2 max-h-[65vh] overflow-y-auto"></div>
-    <article id="det" class="md:col-span-3 bg-panel border border-edge rounded p-5 min-h-[10rem] max-h-[65vh] overflow-y-auto text-dim">Pick a result to read it here.</article>
-  </div>
-</section>
-
-<section id="about" class="sec max-w-prose">
-  <h2 class="f text-4xl mb-4">About</h2>
-  <div class="space-y-4 leading-relaxed">
-    <p>The Wayfarer's Folio is a small companion for 5th Edition games. It has a self-calculating character sheet, expandable session notes, and a rules compendium.</p>
-    <p>Your sheet and notes are stored in this browser's local storage. Nothing is sent to a server, and clearing your browser data will erase them.</p>
-    <p>Compendium entries come from the free <a class="text-verd underline" href="https://www.dnd5eapi.co" target="_blank" rel="noopener">D&amp;D 5e API</a>, which serves content from the System Reference Document. It needs an internet connection.</p>
-    <p class="text-dim">Built with plain JavaScript and Tailwind CSS.</p>
-    <button id="wipe" class="px-4 py-2 rounded border border-ember text-ember hover:bg-ember hover:text-ink">Erase sheet and notes</button>
+    <article id="det" class="md:col-span-3 bg-panel border border-edge rounded p-5 min-h-[10rem] max-h-[65vh] overflow-y-auto text-dim ">Pick a result to read it here.</article>
   </div>
 </section>
 
 </main>
+
+<footer id="foot">
+  <div class="max-w-6xl mx-auto px-4 py-2 grid md:grid-cols-3 gap-4 text-xs md:text-sm leading-relaxed items-center">
+    <div>
+      <h2 class="f text-lg mb-0.5">About Cantrip</h2>
+      <p>Cantrip is a beginner-friendly lightweight web application for D&D 5e, utilizing local storage (notes/sheets won't sync across devices).</p>
+    </div>
+    <div class="space-y-0.5">
+      <p>Cantrip was made with someone in mind.</p>
+      <p>Compendium entries come from the free <a class="text-verd underline" href="https://www.dnd5eapi.co" target="_blank" rel="noopener">D&amp;D 5e API</a>.</p>
+    </div>
+    <div class="flex md:justify-end">
+      <button id="wipe" class="px-2.5 py-1 text-xs rounded border border-ember text-ember hover:bg-ember hover:text-ink">Erase sheet and notes</button>
+    </div>
+  </div>
+</footer>
 
 <script src="app.js"></script>
 </body>

@@ -146,7 +146,7 @@ function renderPinnedNotes() {
   }
 
   $('#h-pins').innerHTML = pinned.map(note => `
-    <div class="wrap flex flex-col h-72">
+    <div class="wrap flex flex-col h-72 bg-ink border border-edge rounded p-3 min-h-[9rem]">
       <button data-open="${note.id}" class="wrap f text-xl text-left hover:text-ember shrink-0">${escapeHtml(noteTitle(note))}</button>
       <div tabindex="0" role="region" aria-label="Text of ${escapeHtml(noteTitle(note))}"
            class="wrap scroll flex-1 min-h-0 my-2 text-dim whitespace-pre-wrap">${escapeHtml(note.body) || 'Empty note.'}</div>

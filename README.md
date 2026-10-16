@@ -1,7 +1,7 @@
 # Features and Functions
 ## General
 - Responsive layout
-- Singe page application
+- Single page application
 - Data saved on local storage
 - Erase data button
 - Values inappropriate for their fields are unable to written.
